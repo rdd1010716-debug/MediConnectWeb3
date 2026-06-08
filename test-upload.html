@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Prueba de Subida - MediConnect</title>
+    <style>body { font-family: Arial; padding: 20px; }</style>
+</head>
+<body>
+    <h2>Prueba de Subida Multimedia 📸</h2>
+    
+    <label>Token JWT:</label><br>
+    <input type="text" id="tokenInput" placeholder="eyJhbG..." style="width: 100%; margin-bottom: 15px;"><br>
+
+    <label>Selecciona una imagen:</label><br>
+    <input type="file" id="fileInput" accept="image/*" style="margin-bottom: 15px;"><br>
+
+    <button onclick="subirArchivo()" style="padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer;">Subir Archivo</button>
+
+    <h4 style="margin-top: 20px;">Respuesta del Servidor:</h4>
+    <pre id="resultado" style="background: #f4f4f4; padding: 10px; border: 1px solid #ccc;"></pre>
+
+    <script>
+        async function subirArchivo() {
+            const token = document.getElementById('tokenInput').value;
+            const fileInput = document.getElementById('fileInput');
+
+            if (!token) return alert("Pega tu token primero");
+            if (fileInput.files.length === 0) return alert("Selecciona un archivo");
+
+            // Creamos el formulario virtual
+            const formData = new FormData();
+            formData.append('id_cita', '1');
+            formData.append('tipo_content', 'image');
+            formData.append('archivo', fileInput.files[0]); // El nombre 'archivo' debe coincidir con upload.single('archivo')
+
+            document.getElementById('resultado').innerText = "Subiendo a Supabase... ⏳";
+
+            try {
+                // Hacemos la petición POST a tu backend
+                const response = await fetch('http://localhost:3000/api/chat/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                        // Nota: No se pone 'Content-Type' cuando envías FormData, el navegador lo pone automático con el boundary correcto
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                document.getElementById('resultado').innerText = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('resultado').innerText = "Error de conexión: " + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
