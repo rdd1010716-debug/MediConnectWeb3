@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Prueba de Chat - MediConnect</title>
+    <!-- Importamos la librería de Socket.io -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #chatBox { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
+        .mensaje { margin-bottom: 8px; padding: 5px; background: #eef; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h2>Chat en Tiempo Real - Sala de Prueba</h2>
+    
+    <div>
+        <label>Pega tu Token JWT (Paciente o Médico):</label><br>
+        <input type="text" id="tokenInput" placeholder="eyJhbGci..." style="width: 100%; margin-bottom: 10px;">
+        <button onclick="conectarChat()">Conectar al Chat</button>
+    </div>
+
+    <div id="chatBox"></div>
+
+    <div>
+        <input type="text" id="mensajeInput" placeholder="Escribe un mensaje..." style="width: 70%;" disabled>
+        <button id="btnEnviar" onclick="enviarMensaje()" disabled>Enviar</button>
+    </div>
+
+    <script>
+        let socket;
+        const id_cita_prueba = 1; // Probaremos con la cita que creamos en el Sprint 2
+
+        function conectarChat() {
+            const token = document.getElementById('tokenInput').value;
+            if (!token) return alert("Pon un token primero!");
+
+            // Conectar al backend enviando el token en el handshake
+            socket = io('http://localhost:3000', {
+                auth: { token: token }
+            });
+
+            socket.on('connect', () => {
+                imprimirMensaje("🟢 Conectado exitosamente al servidor.", "#cfc");
+                document.getElementById('mensajeInput').disabled = false;
+                document.getElementById('btnEnviar').disabled = false;
+
+                // Unirse a la sala de la cita médica
+                socket.emit('join_room', { id_cita: id_cita_prueba });
+            });
+
+            socket.on('connect_error', (err) => {
+                imprimirMensaje("🔴 Error de conexión: " + err.message, "#fcc");
+            });
+
+            // Escuchar los mensajes que lleguen
+            socket.on('receive_message', (data) => {
+                imprimirMensaje(`💬 [Usuario ${data.emisor_id}]: ${data.contenido}`);
+            });
+        }
+
+        function enviarMensaje() {
+            const input = document.getElementById('mensajeInput');
+            if (!input.value) return;
+
+            // Emitir el evento al backend
+            socket.emit('send_message', {
+                id_cita: id_cita_prueba,
+                tipo_content: 'text',
+                contenido: input.value
+            });
+
+            input.value = '';
+        }
+
+        function imprimirMensaje(texto, bgColor = "#eef") {
+            const box = document.getElementById('chatBox');
+            box.innerHTML += `<div class="mensaje" style="background-color: ${bgColor}">${texto}</div>`;
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+</body>
+</html>

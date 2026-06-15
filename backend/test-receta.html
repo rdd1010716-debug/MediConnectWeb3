@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Prueba de Recetas</title>
+</head>
+<body>
+    <h2>Subir Receta Digital 📄</h2>
+    
+    <label>Token JWT:</label><br>
+    <input type="text" id="tokenInput" style="width: 100%;"><br>
+    
+    <label>ID Historia Clínica:</label><br>
+    <input type="number" id="idHistoria" value="1"><br>
+
+    <label>Selecciona el PDF:</label><br>
+    <input type="file" id="fileInput" accept="application/pdf"><br>
+
+    <button onclick="subirReceta()">Subir Receta</button>
+
+    <pre id="resultado"></pre>
+
+    <script>
+        async function subirReceta() {
+            const formData = new FormData();
+            formData.append('id_historia', document.getElementById('idHistoria').value);
+            formData.append('archivo', document.getElementById('fileInput').files[0]);
+
+            const res = await fetch('http://localhost:3000/api/recetas/upload', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${document.getElementById('tokenInput').value}` },
+                body: formData
+            });
+            const data = await res.json();
+            document.getElementById('resultado').innerText = JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>
