@@ -1,0 +1,20 @@
+{
+  "name": "mediconnect-monorepo",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "backend": "npm run dev --workspace=backend",
+    "web": "npm run dev --workspace=web",
+    "mobile": "npm run start --workspace=mobile",
+    "dev": "concurrently \"npm run backend\" \"npm run web\"",
+    "install:all": "npm install --workspace=backend && npm install --workspace=web && npm install --workspace=mobile"
+  },
+  "workspaces": [
+    "backend",
+    "web",
+    "mobile"
+  ],
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}
