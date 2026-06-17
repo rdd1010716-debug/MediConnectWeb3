@@ -70,7 +70,10 @@ export default function ChatScreen() {
       formData.append('tipo_content', tipo);
       const filename = uri.split('/').pop() || 'media.jpg';
       formData.append('archivo', { uri, name: filename, type: 'image/jpeg' } as any);
-      await chatApi.upload(formData);
+      const res = await chatApi.upload(formData);
+      if (res.data?.mensaje) {
+        setMessages((prev) => [...prev, res.data.mensaje]);
+      }
     } catch (e: any) {
       setError(e?.response?.data?.error || 'Error al subir imagen');
     } finally {
@@ -84,6 +87,10 @@ export default function ChatScreen() {
     router.push(`/recetas?id_cita=${idCita}`);
   };
 
+  const openHistorial = () => {
+    router.push(`/historial?id_cita=${idCita}`);
+  };
+
   return (
     <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <StatusBar style="light" />
@@ -93,9 +100,14 @@ export default function ChatScreen() {
         </TouchableOpacity>
         <Text style={styles.topbarTitle}>Chat #{idCita}</Text>
         {user?.rol === 'medico' && (
-          <TouchableOpacity onPress={openReceta}>
-            <MaterialCommunityIcons name="file-document-plus" size={24} color={colors.white} />
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', gap: 14 }}>
+            <TouchableOpacity onPress={openHistorial}>
+              <MaterialCommunityIcons name="file-document-outline" size={24} color={colors.white} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={openReceta}>
+              <MaterialCommunityIcons name="file-document-plus" size={24} color={colors.white} />
+            </TouchableOpacity>
+          </View>
         )}
         {user?.rol !== 'medico' && <View style={{ width: 24 }} />}
       </LinearGradient>

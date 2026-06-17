@@ -94,9 +94,47 @@ const subirArchivoMultimedia = async (req, res) => {
     }
 };
 
+// Enviar mensaje por HTTP (para enviar desde otras pantallas como historial)
+const enviarMensaje = async (req, res) => {
+    try {
+        const { id_cita, tipo_content, contenido } = req.body;
+        const emisor_id = req.usuario.id;
+
+        if (!id_cita || !contenido) {
+            return res.status(400).json({ error: "ID de cita y contenido son obligatorios" });
+        }
+
+        const { data: nuevoMensaje, error } = await supabase
+            .from('mensajes_chat')
+            .insert([{
+                id_cita,
+                emisor_id,
+                tipo_content: tipo_content || 'text',
+                contenido
+            }])
+            .select();
+
+        if (error) throw error;
+
+        // Emitir por socket a la sala
+        const io = req.app.get('io');
+        if (io) {
+            io.to(`cita_${id_cita}`).emit('receive_message', nuevoMensaje[0]);
+        }
+
+        res.status(201).json({
+            message: "Mensaje enviado",
+            mensaje: nuevoMensaje[0]
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 // No olvides exportar ambas funciones
 module.exports = { 
     obtenerHistorial,
-    subirArchivoMultimedia 
+    subirArchivoMultimedia,
+    enviarMensaje
 };
 

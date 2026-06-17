@@ -1,13 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
+  View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity,
 } from 'react-native';
-import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,34 +11,73 @@ import Alert from '../../src/components/Alert';
 import PrimaryButton from '../../src/components/PrimaryButton';
 import { colors, radius, typography, gradients } from '../../src/constants/theme';
 
+const DIAS = [
+  { key: 'lunes', label: 'Lunes' },
+  { key: 'martes', label: 'Martes' },
+  { key: 'miercoles', label: 'Miércoles' },
+  { key: 'jueves', label: 'Jueves' },
+  { key: 'viernes', label: 'Viernes' },
+  { key: 'sabado', label: 'Sábado' },
+  { key: 'domingo', label: 'Domingo' },
+];
+
+interface DiaHorario {
+  activo: boolean;
+  hora_inicio: string;
+  hora_fin: string;
+}
+
 export default function DisponibilidadScreen() {
-  const [fecha, setFecha] = useState('');
-  const [horaInicio, setHoraInicio] = useState('');
-  const [horaFin, setHoraFin] = useState('');
+  const [user, setUser] = useState<any>(null);
+  const [horarios, setHorarios] = useState<Record<string, DiaHorario>>(() => {
+    const init: Record<string, DiaHorario> = {};
+    DIAS.forEach((d) => { init[d.key] = { activo: false, hora_inicio: '08:00', hora_fin: '17:00' }; });
+    return init;
+  });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    getUser().then((u) => setUser(u));
+  }, []);
+
+  const toggleDia = (key: string) => {
+    setHorarios((prev) => ({ ...prev, [key]: { ...prev[key], activo: !prev[key].activo } }));
+  };
+
+  const setHora = (key: string, campo: 'hora_inicio' | 'hora_fin', valor: string) => {
+    setHorarios((prev) => ({ ...prev, [key]: { ...prev[key], [campo]: valor } }));
+  };
+
   const handleSave = async () => {
     setError('');
     setSuccess('');
-    if (!fecha.trim()) return setError('Ingresa la fecha.');
-    if (!horaInicio.trim()) return setError('Ingresa hora inicio.');
-    if (!horaFin.trim()) return setError('Ingresa hora fin.');
+    const activos = DIAS.filter((d) => horarios[d.key].activo);
+    if (activos.length === 0) return setError('Selecciona al menos un día.');
 
     setLoading(true);
     try {
-      const user = await getUser();
-      await disponibilidadApi.set({
-        id_medico: user?.id || 0,
-        fecha,
-        hora_inicio: horaInicio,
-        hora_fin: horaFin,
-      });
-      setSuccess('Disponibilidad guardada.');
-      setFecha('');
-      setHoraInicio('');
-      setHoraFin('');
+      // Guardar cada día como un registro. Usamos fecha base del próximo lunes como referencia
+      const hoy = new Date();
+      const diaSemana = hoy.getDay(); // 0=dom, 1=lun
+      const lunesActual = new Date(hoy);
+      lunesActual.setDate(hoy.getDate() - (diaSemana === 0 ? 6 : diaSemana - 1));
+
+      const diaIndex: Record<string, number> = { lunes:0, martes:1, miercoles:2, jueves:3, viernes:4, sabado:5, domingo:6 };
+
+      for (const d of activos) {
+        const fechaReg = new Date(lunesActual);
+        fechaReg.setDate(lunesActual.getDate() + diaIndex[d.key]);
+        const fechaStr = fechaReg.toISOString().split('T')[0];
+        await disponibilidadApi.set({
+          id_medico: user?.id || 0,
+          fecha: fechaStr,
+          hora_inicio: horarios[d.key].hora_inicio,
+          hora_fin: horarios[d.key].hora_fin,
+        });
+      }
+      setSuccess('Disponibilidad semanal guardada.');
     } catch (e: any) {
       setError(e?.response?.data?.error || e?.message || 'Error al guardar');
     } finally {
@@ -56,25 +89,50 @@ export default function DisponibilidadScreen() {
     <View style={styles.shell}>
       <StatusBar style="light" />
       <LinearGradient colors={gradients.heroDoctor} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.topbar}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.white} />
-        </TouchableOpacity>
-        <Text style={styles.topbarTitle}>Disponibilidad</Text>
-        <View style={{ width: 24 }} />
+        <Text style={styles.topbarTitle}>Mi Disponibilidad Semanal</Text>
       </LinearGradient>
 
       <ScrollView contentContainerStyle={styles.content}>
         <Alert type="error" message={error} />
         <Alert type="success" message={success} />
 
-        <Text style={styles.label}>Fecha</Text>
-        <TextInput style={styles.input} placeholder="YYYY-MM-DD" value={fecha} onChangeText={setFecha} />
+        <Text style={styles.desc}>Marca los días que atenderás y define tu horario. Puedes modificarlo cuando quieras.</Text>
 
-        <Text style={styles.label}>Hora inicio</Text>
-        <TextInput style={styles.input} placeholder="HH:MM" value={horaInicio} onChangeText={setHoraInicio} />
+        {DIAS.map((d) => (
+          <View key={d.key} style={styles.dayCard}>
+            <TouchableOpacity style={styles.dayHeader} onPress={() => toggleDia(d.key)}>
+              <MaterialCommunityIcons
+                name={horarios[d.key].activo ? 'checkbox-marked' : 'checkbox-blank-outline'}
+                size={26}
+                color={horarios[d.key].activo ? colors.primary : colors.muted}
+              />
+              <Text style={[styles.dayLabel, horarios[d.key].activo && styles.dayLabelActive]}>{d.label}</Text>
+            </TouchableOpacity>
 
-        <Text style={styles.label}>Hora fin</Text>
-        <TextInput style={styles.input} placeholder="HH:MM" value={horaFin} onChangeText={setHoraFin} />
+            {horarios[d.key].activo && (
+              <View style={styles.horasRow}>
+                <View style={styles.horaField}>
+                  <Text style={styles.horaLabel}>Inicio</Text>
+                  <TextInput
+                    style={styles.horaInput}
+                    value={horarios[d.key].hora_inicio}
+                    onChangeText={(v) => setHora(d.key, 'hora_inicio', v)}
+                    placeholder="HH:MM"
+                  />
+                </View>
+                <View style={styles.horaField}>
+                  <Text style={styles.horaLabel}>Fin</Text>
+                  <TextInput
+                    style={styles.horaInput}
+                    value={horarios[d.key].hora_fin}
+                    onChangeText={(v) => setHora(d.key, 'hora_fin', v)}
+                    placeholder="HH:MM"
+                  />
+                </View>
+              </View>
+            )}
+          </View>
+        ))}
 
         <PrimaryButton title={loading ? 'Guardando...' : 'Guardar disponibilidad'} loading={loading} onPress={handleSave} />
       </ScrollView>
@@ -84,17 +142,16 @@ export default function DisponibilidadScreen() {
 
 const styles = StyleSheet.create({
   shell: { flex: 1, backgroundColor: colors.bg },
-  topbar: {
-    paddingTop: 50, paddingBottom: 16, paddingHorizontal: 20,
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl,
-  },
-  topbarTitle: { fontSize: typography.sizes.lg, fontWeight: typography.weights.black, color: colors.white },
+  topbar: { paddingTop: 20, paddingBottom: 16, paddingHorizontal: 20, borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl },
+  topbarTitle: { fontSize: typography.sizes.xl, fontWeight: typography.weights.black, color: colors.white },
   content: { padding: 20, paddingBottom: 40, gap: 14 },
-  label: { fontSize: typography.sizes.base, fontWeight: typography.weights.extrabold, color: colors.primaryDark },
-  input: {
-    backgroundColor: colors.inputBg, borderWidth: 1, borderColor: colors.border,
-    borderRadius: radius.md, paddingHorizontal: 14, paddingVertical: 13,
-    fontSize: typography.sizes.md, color: colors.text,
-  },
+  desc: { fontSize: typography.sizes.base, color: colors.muted, lineHeight: 22 },
+  dayCard: { backgroundColor: colors.cardTranslucent, borderWidth: 1, borderColor: colors.border, borderRadius: radius.xxl, padding: 16, gap: 12 },
+  dayHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  dayLabel: { fontSize: typography.sizes.md, fontWeight: typography.weights.bold, color: colors.text },
+  dayLabelActive: { color: colors.primary },
+  horasRow: { flexDirection: 'row', gap: 12, paddingLeft: 38 },
+  horaField: { flex: 1 },
+  horaLabel: { fontSize: typography.sizes.xs, fontWeight: typography.weights.extrabold, color: colors.muted, textTransform: 'uppercase', marginBottom: 4 },
+  horaInput: { backgroundColor: colors.inputBg, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, paddingHorizontal: 14, paddingVertical: 12, fontSize: typography.sizes.base, color: colors.text },
 });

@@ -64,7 +64,7 @@ export default function AdminChatsScreen() {
       </LinearGradient>
       <ScrollView contentContainerStyle={styles.content}>
         {citas.filter((c) => c.estado !== 'cancelada').map((c) => (
-          <TouchableOpacity key={c.id} style={styles.card} onPress={() => router.push(`/chats/${c.id}`)}>
+          <TouchableOpacity key={c.id} style={styles.card} onPress={() => router.push(`/chats/detail?idCita=${c.id}`)}>
             <View style={styles.row}>
               <Text style={styles.id}>Chat Cita #{c.id}</Text>
               <MaterialCommunityIcons name="eye" size={20} color={colors.primary} />

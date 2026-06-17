@@ -38,4 +38,26 @@ const obtenerHistoria = async (req, res) => {
     }
 };
 
-module.exports = { guardarHistoria, obtenerHistoria };
+// Actualizar historia clínica existente
+const actualizarHistoria = async (req, res) => {
+    try {
+        const { id_cita, diagnostico, tratamiento, notas_medicas } = req.body;
+
+        const { data, error } = await supabase
+            .from('historias_clinicas')
+            .update({ diagnostico, tratamiento, notas_medicas })
+            .eq('id_cita', id_cita)
+            .select();
+
+        if (error) throw error;
+
+        res.status(200).json({
+            message: "Historia clínica actualizada correctamente ✏️",
+            data: data[0]
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+module.exports = { guardarHistoria, obtenerHistoria, actualizarHistoria };

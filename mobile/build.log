@@ -1,10 +1,11 @@
 env: load .env
 env: export EXPO_PUBLIC_API_URL EXPO_PUBLIC_SOCKET_URL
 Starting Metro Bundler
-iOS node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓░░░░░░░ 58.4% (602/788)
-iOS node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 99.8% (1086/1099)
+iOS node_modules\expo-router\entry.js ▓▓░░░░░░░░░░░░░░ 16.0% ( 5/13)
+iOS node_modules\expo-router\entry.js ▓▓▓▓▓▓░░░░░░░░░░ 40.3% (197/360)
+iOS node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 70.9% (695/828)
 iOS node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 99.9% (1115/1115)
-iOS Bundled 16128ms node_modules\expo-router\entry.js (1115 modules)
+iOS Bundled 17477ms node_modules\expo-router\entry.js (1115 modules)
 iOS node_modules\expo-router\entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 99.9% (1115/1115)
 
 › Assets (42):
@@ -41,7 +42,7 @@ node_modules\expo-router\assets\sitemap.png (465 B)
 node_modules\expo-router\assets\unmatched.png (4.75 kB)
 
 › ios bundles (1):
-_expo/static/js/ios/entry-01df78fd62f61340d6c0f52d7bd9e65e.hbc (3.25 MB)
+_expo/static/js/ios/entry-0da2e91e74d342a42171954d56bea005.hbc (3.25 MB)
 
 › Files (1):
 metadata.json (3.02 kB)

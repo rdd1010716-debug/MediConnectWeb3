@@ -41,7 +41,7 @@ export default function ChatsIndexScreen() {
             <Text style={styles.emptyText}>Agenda una cita para iniciar un chat con tu médico.</Text>
           </View>
         ) : citas.map((c) => (
-          <TouchableOpacity key={c.id} style={styles.card} onPress={() => router.push(`/chats/${c.id}`)}>
+          <TouchableOpacity key={c.id} style={styles.card} onPress={() => router.push(`/chats/detail?idCita=${c.id}`)}>
             <View style={styles.avatar}>
               <MaterialCommunityIcons name="chat-processing" size={24} color={colors.white} />
             </View>

@@ -10,6 +10,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // Cualquier usuario logueado con token válido puede consultar el historial de sus citas
 router.get('/historial/:id_cita', verificarToken, chatController.obtenerHistorial);
 router.post('/upload', verificarToken, upload.single('archivo'), chatController.subirArchivoMultimedia);
+router.post('/enviar', verificarToken, chatController.enviarMensaje);
 
 
 module.exports = router;

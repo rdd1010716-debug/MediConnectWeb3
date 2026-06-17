@@ -156,6 +156,9 @@ io.on('connection', (socket) => {
 app.use(cors());
 app.use(express.json());
 
+// Exponer io para controllers
+app.set('io', io);
+
 // Rutas API
 app.use('/api/auth', authRoutes);
 app.use('/api/citas', citaRoutes);

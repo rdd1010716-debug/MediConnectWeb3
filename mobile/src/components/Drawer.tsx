@@ -29,7 +29,8 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { label: 'Dashboard', icon: 'view-dashboard', route: '/dashboard', roles: ['admin', 'medico', 'paciente'] },
+  { label: 'Dashboard', icon: 'view-dashboard', route: '/dashboard', roles: ['admin'] },
+  { label: 'Inicio', icon: 'home', route: '/dashboard', roles: ['medico', 'paciente'] },
   { label: 'Mi Cuenta', icon: 'account', route: '/profile', roles: ['admin', 'medico', 'paciente'] },
   { label: 'Buscar Médico', icon: 'magnify', route: '/medicos', roles: ['paciente'] },
   { label: 'Mis Citas', icon: 'calendar-check', route: '/citas', roles: ['medico', 'paciente'] },

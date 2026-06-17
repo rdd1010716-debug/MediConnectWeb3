@@ -67,7 +67,7 @@ export default function CitasScreen() {
               <Text style={styles.cardDate}>{c.fecha} · {c.hora}</Text>
               <View style={styles.cardActions}>
                 {(c.estado === 'programada' || c.estado === 'en_progreso') && (
-                  <TouchableOpacity style={styles.actionBtn} onPress={() => router.push(`/chats/${c.id}`)}>
+                  <TouchableOpacity style={styles.actionBtn} onPress={() => router.push(`/chats/detail?idCita=${c.id}`)}>
                     <MaterialCommunityIcons name="chat-processing" size={18} color={colors.white} />
                     <Text style={styles.actionText}>Chat</Text>
                   </TouchableOpacity>
