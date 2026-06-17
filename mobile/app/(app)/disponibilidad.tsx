@@ -11,11 +11,11 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { disponibilidadApi } from '../src/api/endpoints';
-import { getUser } from '../src/auth/session';
-import Alert from '../src/components/Alert';
-import PrimaryButton from '../src/components/PrimaryButton';
-import { colors, radius, typography, gradients } from '../src/constants/theme';
+import { disponibilidadApi } from '../../src/api/endpoints';
+import { getUser } from '../../src/auth/session';
+import Alert from '../../src/components/Alert';
+import PrimaryButton from '../../src/components/PrimaryButton';
+import { colors, radius, typography, gradients } from '../../src/constants/theme';
 
 export default function DisponibilidadScreen() {
   const [fecha, setFecha] = useState('');

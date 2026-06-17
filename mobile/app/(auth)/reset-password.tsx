@@ -11,11 +11,11 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { authApi } from '../src/api/endpoints';
-import BrandPanel from '../src/components/BrandPanel';
-import PrimaryButton from '../src/components/PrimaryButton';
-import Alert from '../src/components/Alert';
-import { colors, radius, typography } from '../src/constants/theme';
+import { authApi } from '../../src/api/endpoints';
+import BrandPanel from '../../src/components/BrandPanel';
+import PrimaryButton from '../../src/components/PrimaryButton';
+import Alert from '../../src/components/Alert';
+import { colors, radius, typography } from '../../src/constants/theme';
 
 export default function ResetPasswordScreen() {
   const { token } = useLocalSearchParams<{ token?: string }>();

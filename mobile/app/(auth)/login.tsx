@@ -11,13 +11,13 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { authApi } from '../src/api/endpoints';
-import { saveSession, roleHome } from '../src/auth/session';
-import { isValidEmail } from '../src/utils/helpers';
-import BrandPanel from '../src/components/BrandPanel';
-import PrimaryButton from '../src/components/PrimaryButton';
-import Alert from '../src/components/Alert';
-import { colors, radius, typography } from '../src/constants/theme';
+import { authApi } from '../../src/api/endpoints';
+import { saveSession, roleHome } from '../../src/auth/session';
+import { isValidEmail } from '../../src/utils/helpers';
+import BrandPanel from '../../src/components/BrandPanel';
+import PrimaryButton from '../../src/components/PrimaryButton';
+import Alert from '../../src/components/Alert';
+import { colors, radius, typography } from '../../src/constants/theme';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');

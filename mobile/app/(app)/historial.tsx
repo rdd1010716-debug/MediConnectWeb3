@@ -11,11 +11,11 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { historiaApi } from '../src/api/endpoints';
-import { getUser } from '../src/auth/session';
-import Alert from '../src/components/Alert';
-import PrimaryButton from '../src/components/PrimaryButton';
-import { colors, radius, typography, gradients } from '../src/constants/theme';
+import { historiaApi } from '../../src/api/endpoints';
+import { getUser } from '../../src/auth/session';
+import Alert from '../../src/components/Alert';
+import PrimaryButton from '../../src/components/PrimaryButton';
+import { colors, radius, typography, gradients } from '../../src/constants/theme';
 
 export default function HistorialScreen() {
   const { id_cita } = useLocalSearchParams<{ id_cita?: string }>();
